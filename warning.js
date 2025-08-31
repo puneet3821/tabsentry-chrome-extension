@@ -16,11 +16,21 @@ async function refreshPage() {
   const managedTabs = await getManagedTabs();
   const tabCount = managedTabs.length;
 
-  // Update header
-  header.textContent = `Tab Limit Reached: ${tabCount} / ${tabLimit} tabs`;
-
-  // Render tab list
-  renderTabList(managedTabs);
+  if (tabCount > tabLimit) {
+    header.style.backgroundColor = '#fbe9e7'; // Red
+    header.style.color = '#c62828';
+    header.textContent = `Tab Limit Reached: ${tabCount} / ${tabLimit} tabs`;
+    renderTabList(managedTabs);
+  } else {
+    header.style.backgroundColor = '#e8f5e9'; // Green
+    header.style.color = '#2e7d32';
+    header.textContent = `Success! You're back to ${tabCount} / ${tabLimit} tabs. This page will close shortly.`;
+    snoozeButtons.style.display = 'none';
+    tabListContainer.style.display = 'none';
+    setTimeout(() => {
+      window.close();
+    }, 2500);
+  }
 }
 
 function renderTabList(tabs) {

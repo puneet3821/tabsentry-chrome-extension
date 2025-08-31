@@ -24,12 +24,17 @@ async function updateBadgeAndWarning() {
       closeWarningTabIfNotActive();
     }
   }
-  
-  // Inform the warning page to refresh its list
+
+  // Always inform the warning page to refresh its list, if it exists.
   const warningUrl = chrome.runtime.getURL('warning.html');
   const warningTabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
   if (warningTabs.length > 0) {
-    chrome.tabs.sendMessage(warningTabs[0].id, { command: 'refresh' });
+    try {
+      await chrome.tabs.sendMessage(warningTabs[0].id, { command: 'refresh' });
+    } catch (error) {
+      // Ignore errors, the tab might be closing or not ready.
+      console.log(`Could not send refresh message: ${error.message}`);
+    }
   }
 }
 
