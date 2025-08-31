@@ -1,15 +1,12 @@
 'use strict';
 
-import { getManagedTabs, getStorageData } from './utils.js';
+import { getManagedTabs, getStorageData, renderTabList, setupSnoozeEventListeners, setupTabListEventListeners } from './utils.js';
 
 const header = document.getElementById('header');
 const snoozeButtons = document.getElementById('snooze-buttons');
 const tabListContainer = document.getElementById('tab-list');
 
-document.addEventListener('DOMContentLoaded', async () => {
-  await refreshPage();
-  setupEventListeners();
-});
+document.addEventListener('DOMContentLoaded', refreshPage);
 
 async function refreshPage() {
   const { tabLimit = 10 } = await getStorageData(['tabLimit']);
@@ -17,12 +14,15 @@ async function refreshPage() {
   const tabCount = managedTabs.length;
 
   if (tabCount > tabLimit) {
-    header.style.backgroundColor = '#fbe9e7'; // Red
+    header.style.backgroundColor = '#fbe9e7';
     header.style.color = '#c62828';
     header.textContent = `Tab Limit Reached: ${tabCount} / ${tabLimit} tabs`;
-    renderTabList(managedTabs);
+    const onTitleClick = (tabId) => {
+      chrome.tabs.update(tabId, { active: true });
+    };
+    renderTabList(tabListContainer, managedTabs, onTitleClick);
   } else {
-    header.style.backgroundColor = '#e8f5e9'; // Green
+    header.style.backgroundColor = '#e8f5e9';
     header.style.color = '#2e7d32';
     header.textContent = `Success! You're back to ${tabCount} / ${tabLimit} tabs. This page will close shortly.`;
     snoozeButtons.style.display = 'none';
@@ -33,55 +33,11 @@ async function refreshPage() {
   }
 }
 
-function renderTabList(tabs) {
-  tabListContainer.innerHTML = ''; // Clear existing list
-  tabs.forEach((tab) => {
-    const listItem = document.createElement('li');
-    
-    const tabTitle = document.createElement('span');
-    tabTitle.className = 'tab-title';
-    tabTitle.textContent = tab.title;
-    tabTitle.addEventListener('click', () => {
-      chrome.tabs.update(tab.id, { active: true });
-    });
+setupSnoozeEventListeners(snoozeButtons);
+setupTabListEventListeners(tabListContainer, refreshPage);
 
-    const closeButton = document.createElement('button');
-    closeButton.textContent = 'x';
-    closeButton.dataset.tabId = tab.id;
-
-    listItem.appendChild(tabTitle);
-    listItem.appendChild(closeButton);
-    tabListContainer.appendChild(listItem);
-  });
-}
-
-function setupEventListeners() {
-  tabListContainer.addEventListener('click', async (event) => {
-    if (event.target.tagName === 'BUTTON' && event.target.dataset.tabId) {
-      const tabId = parseInt(event.target.dataset.tabId, 10);
-      await new Promise(resolve => chrome.tabs.remove(tabId, resolve));
-      // After closing a tab, the background script will auto-update everything,
-      // including potentially closing this page if the limit is met.
-      // For an immediate visual refresh, we can re-render the list.
-      await refreshPage();
-    }
-  });
-
-  snoozeButtons.addEventListener('click', (event) => {
-    if (event.target.tagName === 'BUTTON') {
-      const minutes = parseInt(event.target.dataset.snooze, 10);
-      const snoozeUntil = Date.now() + minutes * 60 * 1000;
-      chrome.storage.sync.set({ snoozeUntil }, () => {
-        chrome.runtime.sendMessage({ command: 'updateBadge' });
-        window.close();
-      });
-    }
-  });
-
-  // Listen for refresh messages from the background script
-  chrome.runtime.onMessage.addListener((request) => {
-    if (request.command === 'refresh') {
-      refreshPage();
-    }
-  });
-}
+chrome.runtime.onMessage.addListener((request) => {
+  if (request.command === 'refresh') {
+    refreshPage();
+  }
+});
