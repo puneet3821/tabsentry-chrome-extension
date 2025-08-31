@@ -39,6 +39,28 @@ export function renderTabList(tabListContainer, tabs, onTitleClick) {
   });
 }
 
+// Cancels the snooze by removing the snoozeUntil value from storage.
+export async function cancelSnooze() {
+  await new Promise(resolve => chrome.storage.sync.remove('snoozeUntil', resolve));
+  // Send a message to the background script to immediately update the badge.
+  chrome.runtime.sendMessage({ command: 'updateBadge' });
+}
+
+// Formats the remaining time into a human-readable string.
+export function formatTimeRemaining(endTime) {
+  const totalSeconds = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  let timeString = '';
+  if (hours > 0) timeString += `${hours}h `;
+  if (minutes > 0) timeString += `${minutes}m `;
+  timeString += `${seconds}s remaining`;
+
+  return timeString;
+}
+
 // Sets up the event listeners for the snooze buttons.
 export function setupSnoozeEventListeners(snoozeContainer) {
   snoozeContainer.addEventListener('click', (event) => {
