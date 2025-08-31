@@ -68,7 +68,8 @@ chrome.tabs.onCreated.addListener((tab) => {
 chrome.tabs.onRemoved.addListener(updateBadgeAndWarning);
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.hasOwnProperty('pinned')) {
+  // If a tab's pinned status or group status changes, trigger an update.
+  if (changeInfo.hasOwnProperty('pinned') || changeInfo.hasOwnProperty('groupId')) {
     updateBadgeAndWarning();
   }
 });

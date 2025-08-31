@@ -1,12 +1,12 @@
 'use strict';
 
-// Gets all tabs that are not pinned and not the warning page.
+// Gets all tabs that are not pinned, not in a group, and not the warning page.
 export async function getManagedTabs() {
   const tabs = await new Promise(resolve => {
     chrome.tabs.query({ windowType: 'normal', pinned: false }, resolve);
   });
   const warningUrl = chrome.runtime.getURL('warning.html');
-  return tabs.filter(tab => tab.url !== warningUrl);
+  return tabs.filter(tab => tab.url !== warningUrl && tab.groupId === -1);
 }
 
 // Gets data from chrome.storage.sync.
