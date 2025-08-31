@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const limit = data.tabLimit;
     const snoozeUntil = data.snoozeUntil || 0;
 
-    chrome.tabs.query({ windowType: 'normal' }, (tabs) => {
+    chrome.tabs.query({ windowType: 'normal', pinned: false }, (tabs) => {
       const tabCount = tabs.length;
 
       if (limit && tabCount > limit && Date.now() > snoozeUntil) {

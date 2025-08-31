@@ -1,6 +1,6 @@
 
 function updateTabCount() {
-  chrome.tabs.query({ windowType: 'normal' }, (tabs) => {
+  chrome.tabs.query({ windowType: 'normal', pinned: false }, (tabs) => {
     const tabCount = tabs.length;
 
     chrome.storage.sync.get(['tabLimit', 'snoozeUntil', 'intrusiveMode'], (data) => {
@@ -21,7 +21,9 @@ function updateTabCount() {
               if (tabs.length === 0) {
                 chrome.tabs.create({ url: 'warning.html' });
               } else {
-                chrome.tabs.update(tabs[0].id, { active: true });
+                const tabId = tabs[0].id;
+                chrome.tabs.reload(tabId);
+                chrome.tabs.update(tabId, { active: true });
               }
             });
           }

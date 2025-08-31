@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabList = document.getElementById('tab-list');
 
   function refreshTabList() {
-    chrome.tabs.query({ windowType: 'normal' }, (tabs) => {
+    chrome.tabs.query({ windowType: 'normal', pinned: false }, (tabs) => {
       tabList.innerHTML = '';
       tabs.forEach((tab) => {
         const listItem = document.createElement('li');
