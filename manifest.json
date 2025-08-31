@@ -5,7 +5,8 @@
   "description": "A Chrome extension to manage tabs and stay focused.",
   "permissions": ["tabs", "storage"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "icons": {
     "128": "icon.png"

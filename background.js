@@ -1,70 +1,77 @@
+import { getManagedTabs, getStorageData } from './utils.js';
 
-function updateTabCount() {
-  chrome.tabs.query({ windowType: 'normal', pinned: false }, (tabs) => {
-    const warningUrl = chrome.runtime.getURL('warning.html');
-    const filteredTabs = tabs.filter(tab => tab.url !== warningUrl);
-    const tabCount = filteredTabs.length;
+async function updateBadgeAndWarning() {
+  const managedTabs = await getManagedTabs();
+  const tabCount = managedTabs.length;
+  const data = await getStorageData(['tabLimit', 'snoozeUntil', 'intrusiveMode']);
 
-    chrome.storage.sync.get(['tabLimit', 'snoozeUntil', 'intrusiveMode'], (data) => {
-      const limit = data.tabLimit;
-      const snoozeUntil = data.snoozeUntil || 0;
-      const intrusiveMode = data.intrusiveMode || false;
+  const limit = data.tabLimit || 10;
+  const snoozeUntil = data.snoozeUntil || 0;
+  const intrusiveMode = data.intrusiveMode || false;
 
-      if (Date.now() < snoozeUntil) {
-        chrome.action.setBadgeText({ text: '💤' });
-        chrome.action.setBadgeBackgroundColor({ color: '#808080' });
-      } else {
-        chrome.action.setBadgeText({ text: String(tabCount) });
-        if (limit && tabCount > limit) {
-          chrome.action.setBadgeBackgroundColor({ color: '#d93025' });
-          if (intrusiveMode) {
-            const warningUrl = chrome.runtime.getURL('warning.html');
-            chrome.tabs.query({ url: warningUrl }, (tabs) => {
-              if (tabs.length === 0) {
-                chrome.tabs.create({ url: 'warning.html' });
-              } else {
-                const tabId = tabs[0].id;
-                chrome.tabs.reload(tabId);
-                chrome.tabs.update(tabId, { active: true });
-              }
-            });
-          }
-        } else {
-          chrome.action.setBadgeBackgroundColor({ color: '#1976d2' });
-          // Close the warning tab if it exists and is not active
-          const warningUrl = chrome.runtime.getURL('warning.html');
-          chrome.tabs.query({ url: warningUrl }, (warningTabs) => {
-            if (warningTabs.length > 0 && !warningTabs[0].active) {
-              chrome.tabs.remove(warningTabs[0].id);
-            }
-          });
-        }
+  if (Date.now() < snoozeUntil) {
+    chrome.action.setBadgeText({ text: '💤' });
+    chrome.action.setBadgeBackgroundColor({ color: '#808080' });
+  } else {
+    chrome.action.setBadgeText({ text: String(tabCount) });
+    if (limit && tabCount > limit) {
+      chrome.action.setBadgeBackgroundColor({ color: '#d93025' });
+      if (intrusiveMode) {
+        handleIntrusiveWarning();
       }
-    });
+    } else {
+      chrome.action.setBadgeBackgroundColor({ color: '#1976d2' });
+      closeWarningTabIfNotActive();
+    }
+  }
+  
+  // Inform the warning page to refresh its list
+  const warningUrl = chrome.runtime.getURL('warning.html');
+  const warningTabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
+  if (warningTabs.length > 0) {
+    chrome.tabs.sendMessage(warningTabs[0].id, { command: 'refresh' });
+  }
+}
 
-    // Inform the warning page to refresh its list
-//    const warningUrl = chrome.runtime.getURL('warning.html');
-    chrome.tabs.query({ url: warningUrl }, (warningTabs) => {
-      if (warningTabs.length > 0) {
-        chrome.tabs.sendMessage(warningTabs[0].id, { command: 'refresh' });
-      }
-    });
-  });
+async function handleIntrusiveWarning() {
+  const warningUrl = chrome.runtime.getURL('warning.html');
+  const tabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
+  if (tabs.length === 0) {
+    chrome.tabs.create({ url: 'warning.html' });
+  } else {
+    const tabId = tabs[0].id;
+    chrome.tabs.reload(tabId);
+    chrome.tabs.update(tabId, { active: true });
+  }
+}
+
+async function closeWarningTabIfNotActive() {
+  const warningUrl = chrome.runtime.getURL('warning.html');
+  const warningTabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
+  if (warningTabs.length > 0 && !warningTabs[0].active) {
+    chrome.tabs.remove(warningTabs[0].id);
+  }
 }
 
 chrome.tabs.onCreated.addListener((tab) => {
   if (tab.pendingUrl && tab.pendingUrl.includes('warning.html')) {
     return;
   }
-  updateTabCount();
+  updateBadgeAndWarning();
 });
-chrome.tabs.onRemoved.addListener(updateTabCount);
+
+chrome.tabs.onRemoved.addListener(updateBadgeAndWarning);
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  // If a tab's pinned status changes, trigger an update
   if (changeInfo.hasOwnProperty('pinned')) {
-    updateTabCount();
+    updateBadgeAndWarning();
   }
 });
 
-updateTabCount();
+chrome.runtime.onMessage.addListener((request) => {
+  if (request.command === 'updateBadge') {
+    updateBadgeAndWarning();
+  }
+});
+
+updateBadgeAndWarning();
