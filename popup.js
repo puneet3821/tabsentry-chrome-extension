@@ -14,12 +14,32 @@ document.addEventListener('DOMContentLoaded', () => {
       const tabList = document.getElementById('tab-list');
       tabs.forEach((tab) => {
         const listItem = document.createElement('li');
-        listItem.textContent = tab.title;
-        listItem.addEventListener('click', () => {
+        
+        const tabTitle = document.createElement('span');
+        tabTitle.textContent = tab.title;
+        tabTitle.style.cursor = 'pointer';
+        tabTitle.addEventListener('click', () => {
           chrome.tabs.update(tab.id, { active: true });
           window.close();
         });
+
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'x';
+        closeButton.dataset.tabId = tab.id;
+        closeButton.style.marginLeft = '10px';
+
+        listItem.appendChild(tabTitle);
+        listItem.appendChild(closeButton);
         tabList.appendChild(listItem);
+      });
+
+      tabList.addEventListener('click', (event) => {
+        if (event.target.tagName === 'BUTTON' && event.target.dataset.tabId) {
+          const tabId = parseInt(event.target.dataset.tabId, 10);
+          chrome.tabs.remove(tabId, () => {
+            event.target.parentElement.remove();
+          });
+        }
       });
 
       document.getElementById('snooze-buttons').addEventListener('click', (event) => {
