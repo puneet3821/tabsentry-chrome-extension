@@ -35,4 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   refreshTabList();
+
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.command === 'refresh') {
+      refreshTabList();
+    }
+  });
 });
