@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ZenTabs - Warning</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      width: 400px;
+      margin: 20px auto;
+    }
+    #warning {
+      color: red;
+      font-weight: bold;
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    li:hover {
+      background-color: #f0f0f0;
+    }
+    .tab-title {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="warning">Tab Limit Reached!</div>
+  <ul id="tab-list"></ul>
+  <script src="warning.js"></script>
+</body>
+</html>

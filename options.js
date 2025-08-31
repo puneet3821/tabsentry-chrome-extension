@@ -1,5 +1,6 @@
 
 const tabLimitInput = document.getElementById('tabLimit');
+const intrusiveModeCheckbox = document.getElementById('intrusiveMode');
 const saveButton = document.getElementById('save');
 const statusDiv = document.getElementById('status');
 
@@ -9,8 +10,9 @@ function saveOptions() {
     statusDiv.textContent = 'Please enter a valid number.';
     return;
   }
-  chrome.storage.sync.set({ tabLimit: limit }, () => {
-    statusDiv.textContent = 'Limit saved!';
+  const intrusiveMode = intrusiveModeCheckbox.checked;
+  chrome.storage.sync.set({ tabLimit: limit, intrusiveMode: intrusiveMode }, () => {
+    statusDiv.textContent = 'Settings saved!';
     setTimeout(() => {
       statusDiv.textContent = '';
     }, 2000);
@@ -18,8 +20,9 @@ function saveOptions() {
 }
 
 function restoreOptions() {
-  chrome.storage.sync.get({ tabLimit: 10 }, (items) => {
+  chrome.storage.sync.get({ tabLimit: 10, intrusiveMode: false }, (items) => {
     tabLimitInput.value = items.tabLimit;
+    intrusiveModeCheckbox.checked = items.intrusiveMode;
   });
 }
 
