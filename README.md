@@ -1,8 +1,8 @@
-# ZenTabs
+# TabSentry
 
 ## Overview
 
-ZenTabs is a productivity-focused Chrome extension designed to combat tab overload and reduce digital distraction. In a world where it's easy to accumulate dozens of open tabs, ZenTabs provides a simple and effective solution by allowing you to set a custom limit on the number of active tabs. This encourages a more focused and mindful browsing experience, helping you stay on task and in control of your digital workspace.
+TabSentry is a productivity-focused Chrome extension designed to combat tab overload and reduce digital distraction. In a world where it's easy to accumulate dozens of open tabs, TabSentry provides a simple and effective solution by allowing you to set a custom limit on the number of active tabs. This encourages a more focused and mindful browsing experience, helping you stay on task and in control of your digital workspace.
 
 ## Core Features
 
@@ -28,18 +28,18 @@ ZenTabs is a productivity-focused Chrome extension designed to combat tab overlo
 
 ## Installation Guide
 
-To install ZenTabs manually from the source code, follow these steps:
+To install TabSentry manually from the source code, follow these steps:
 
 1.  Download and unzip the project folder to a permanent location on your computer.
 2.  Open the Google Chrome browser and navigate to `chrome://extensions`.
 3.  In the top-right corner, toggle the **"Developer mode"** switch to the "on" position.
 4.  Click the **"Load unpacked"** button that appears on the top-left.
 5.  In the file selection dialog, navigate to and select the unzipped project folder.
-6.  The ZenTabs extension should now appear in your list of extensions and in your browser's toolbar.
+6.  The TabSentry extension should now appear in your list of extensions and in your browser's toolbar.
 
 ## How to Use
 
--   **Configuration:** Right-click the ZenTabs icon in your toolbar and select "Options." On this page, you can set your desired tab limit and enable or disable "Intrusive Mode."
+-   **Configuration:** Right-click the TabSentry icon in your toolbar and select "Options." On this page, you can set your desired tab limit and enable or disable "Intrusive Mode."
 -   **Monitoring:** Keep an eye on the icon badge to see your current tab count. Click the icon at any time to open the popup dashboard for a more detailed status.
 -   **Taking Action:**
     -   If you are over your limit, use the snooze buttons in the popup or warning page to temporarily disable the limit.
