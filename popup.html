@@ -6,34 +6,48 @@
     body {
       font-family: sans-serif;
       width: 300px;
+      padding: 10px;
+      text-align: center;
     }
-    #warning {
-      color: red;
+    #status-box {
+      padding: 15px;
+      border-radius: 5px;
       font-weight: bold;
+      margin-bottom: 10px;
+    }
+    #snooze-buttons button {
+      margin: 2px;
     }
     ul {
       list-style-type: none;
       padding: 0;
+      text-align: left;
     }
     li {
-      cursor: pointer;
       padding: 5px;
       border-bottom: 1px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    li:hover {
-      background-color: #f0f0f0;
+    li span:hover {
+      text-decoration: underline;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="warning"></div>
+  <div id="status-box">Loading...</div>
+
   <div id="snooze-buttons" style="display: none;">
     <button data-snooze="10">Snooze 10m</button>
     <button data-snooze="30">Snooze 30m</button>
     <button data-snooze="60">Snooze 1h</button>
     <button data-snooze="1440">Snooze 1 Day</button>
   </div>
-  <ul id="tab-list"></ul>
+
+  <ul id="tab-list" style="display: none;"></ul>
+
   <script type="module" src="popup.js"></script>
 </body>
 </html>
