@@ -5,38 +5,57 @@
   <style>
     body {
       font-family: sans-serif;
-      width: 400px;
+      width: 500px;
       margin: 20px auto;
-    }
-    #warning {
-      color: red;
-      font-weight: bold;
-      font-size: 24px;
       text-align: center;
+    }
+    #header {
+      padding: 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 1.2em;
       margin-bottom: 20px;
+      background-color: #fbe9e7;
+      color: #c62828;
+    }
+    #snooze-buttons button {
+      margin: 5px;
+      padding: 8px 15px;
     }
     ul {
       list-style-type: none;
       padding: 0;
+      margin-top: 20px;
+      text-align: left;
     }
     li {
-      padding: 10px;
+      padding: 8px;
       border-bottom: 1px solid #ccc;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    li:hover {
-      background-color: #f0f0f0;
-    }
-    .tab-title {
+    .tab-title:hover {
+      text-decoration: underline;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="warning">Tab Limit Reached!</div>
+  <div id="header">Loading...</div>
+
+  <div id="snooze-buttons">
+    <p>Need more tabs temporarily? Snooze the limit.</p>
+    <button data-snooze="10">Snooze 10m</button>
+    <button data-snooze="30">Snooze 30m</button>
+    <button data-snooze="60">Snooze 1h</button>
+    <button data-snooze="1440">Snooze 1 Day</button>
+  </div>
+
+  <hr>
+
   <ul id="tab-list"></ul>
+
   <script type="module" src="warning.js"></script>
 </body>
 </html>
