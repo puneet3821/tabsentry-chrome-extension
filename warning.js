@@ -1,6 +1,6 @@
 'use strict';
 
-import { getManagedTabs, getStorageData, renderTabList, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining } from './utils.js';
+import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi } from './utils.js';
 
 const header = document.getElementById('header');
 const snoozeButtons = document.getElementById('snooze-buttons');
@@ -17,47 +17,36 @@ async function refreshPage() {
   const managedTabs = await getManagedTabs();
   const tabCount = managedTabs.length;
 
-  if (Date.now() < snoozeUntil) {
-    // State: Snoozed
-    header.style.backgroundColor = '#e0e0e0';
-    header.style.color = '#333';
-    snoozeButtons.style.display = 'none';
-    cancelSnoozeBtn.style.display = 'block';
-    tabListContainer.style.display = 'none';
-
-    const updateCountdown = () => {
-      header.textContent = `Snoozed! ${formatTimeRemaining(snoozeUntil)}`;
-      if (Date.now() >= snoozeUntil) {
-        refreshPage(); // Refresh the UI once the snooze expires
-      }
-    };
-    updateCountdown();
-    countdownInterval = setInterval(updateCountdown, 1000);
-
-  } else if (tabCount > tabLimit) {
-    // State: Over Limit
-    header.style.backgroundColor = '#fbe9e7';
-    header.style.color = '#c62828';
-    header.textContent = `Tab Limit Reached: ${tabCount} / ${tabLimit} tabs`;
-    snoozeButtons.style.display = 'block';
-    cancelSnoozeBtn.style.display = 'none';
-    tabListContainer.style.display = 'block';
-    const onTitleClick = (tabId) => {
+  updateUi({
+    statusEl: header,
+    snoozeButtonsEl: snoozeButtons,
+    cancelSnoozeBtnEl: cancelSnoozeBtn,
+    tabListContainerEl: tabListContainer,
+    tabCount,
+    limit: tabLimit,
+    snoozeUntil,
+    tabs: managedTabs,
+    onTitleClick: (tabId) => {
       chrome.tabs.update(tabId, { active: true });
-    };
-    renderTabList(tabListContainer, managedTabs, onTitleClick);
-  } else {
-    // State: Within Limit
-    header.style.backgroundColor = '#e8f5e9';
-    header.style.color = '#2e7d32';
-    header.textContent = `Success! You're back to ${tabCount} / ${tabLimit} tabs. This page will close shortly.`;
-    snoozeButtons.style.display = 'none';
-    cancelSnoozeBtn.style.display = 'none';
-    tabListContainer.style.display = 'none';
-    setTimeout(() => {
-      window.close();
-    }, 2500);
-  }
+    },
+    onUnderLimit: () => {
+      header.style.backgroundColor = '#e8f5e9';
+      header.style.color = '#2e7d32';
+      header.textContent = `Success! You're back to ${tabCount} / ${tabLimit} tabs. This page will close shortly.`;
+      snoozeButtons.style.display = 'none';
+      cancelSnoozeBtn.style.display = 'none';
+      tabListContainer.style.display = 'none';
+      setTimeout(() => window.close(), 2500);
+    },
+    startCountdown: () => {
+      const update = () => {
+        header.textContent = `Snoozed! ${formatTimeRemaining(snoozeUntil)}`;
+        if (Date.now() >= snoozeUntil) refreshPage();
+      };
+      update();
+      countdownInterval = setInterval(update, 1000);
+    }
+  });
 }
 
 cancelSnoozeBtn.addEventListener('click', async () => {

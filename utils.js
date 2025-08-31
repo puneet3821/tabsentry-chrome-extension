@@ -61,6 +61,37 @@ export function formatTimeRemaining(endTime) {
   return timeString;
 }
 
+// Central UI management function
+export function updateUi(config) {
+  const {
+    statusEl, snoozeButtonsEl, cancelSnoozeBtnEl, tabListContainerEl,
+    tabCount, limit, snoozeUntil, tabs,
+    onTitleClick, onUnderLimit, startCountdown
+  } = config;
+
+  if (Date.now() < snoozeUntil) {
+    // State: Snoozed
+    statusEl.style.backgroundColor = '#e0e0e0';
+    statusEl.style.color = '#333';
+    snoozeButtonsEl.style.display = 'none';
+    cancelSnoozeBtnEl.style.display = 'block';
+    tabListContainerEl.style.display = 'none';
+    startCountdown();
+  } else if (tabCount > limit) {
+    // State: Over Limit
+    statusEl.style.backgroundColor = '#fbe9e7';
+    statusEl.style.color = '#c62828';
+    statusEl.textContent = `Limit Reached: ${tabCount} / ${limit} tabs`;
+    snoozeButtonsEl.style.display = 'block';
+    cancelSnoozeBtnEl.style.display = 'none';
+    tabListContainerEl.style.display = 'block';
+    renderTabList(tabListContainerEl, tabs, onTitleClick);
+  } else {
+    // State: Within Limit
+    onUnderLimit();
+  }
+}
+
 // Sets up the event listeners for the snooze buttons.
 export function setupSnoozeEventListeners(snoozeContainer) {
   snoozeContainer.addEventListener('click', (event) => {
