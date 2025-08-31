@@ -1,0 +1,50 @@
+/* Light Mode (Default) */
+body {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+button {
+  background-color: #e9ecef;
+  color: #212529;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #dee2e6;
+}
+
+hr {
+  border-color: #dee2e6;
+}
+
+/* Dark Mode */
+body.dark-mode {
+  background-color: #212529;
+  color: #e9ecef;
+}
+
+body.dark-mode button {
+  background-color: #495057;
+  color: #e9ecef;
+  border-color: #6c757d;
+}
+
+body.dark-mode button:hover {
+  background-color: #6c757d;
+}
+
+body.dark-mode hr {
+  border-color: #495057;
+}
+
+body.dark-mode li {
+  border-bottom-color: #495057;
+}
+
+body.dark-mode .tab-title:hover {
+  color: #adb5bd;
+}

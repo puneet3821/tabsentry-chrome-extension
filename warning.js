@@ -8,7 +8,11 @@ const cancelSnoozeBtn = document.getElementById('cancel-snooze-btn');
 const tabListContainer = document.getElementById('tab-list');
 let countdownInterval = null;
 
-document.addEventListener('DOMContentLoaded', refreshPage);
+document.addEventListener('DOMContentLoaded', async () => {
+  const { nightMode = false } = await getStorageData(['nightMode']);
+  document.body.classList.toggle('dark-mode', nightMode);
+  refreshPage();
+});
 
 async function refreshPage() {
   if (countdownInterval) clearInterval(countdownInterval);
