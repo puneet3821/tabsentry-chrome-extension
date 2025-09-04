@@ -21,6 +21,18 @@ hr {
   border-color: #dee2e6;
 }
 
+.options-link {
+  display: block;
+  text-align: right;
+  margin-top: 10px;
+  color: #6c757d;
+  text-decoration: none;
+}
+
+.options-link:hover {
+  text-decoration: underline;
+}
+
 /* Dark Mode */
 body.dark-mode {
   background-color: #212529;
@@ -46,5 +58,9 @@ body.dark-mode li {
 }
 
 body.dark-mode .tab-title:hover {
+  color: #adb5bd;
+}
+
+body.dark-mode .options-link {
   color: #adb5bd;
 }

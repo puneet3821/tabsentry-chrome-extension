@@ -1,6 +1,6 @@
 'use strict';
 
-import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi } from './utils.js';
+import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi, createOptionsLink } from './utils.js';
 
 const statusBox = document.getElementById('status-box');
 const snoozeButtons = document.getElementById('snooze-buttons');
@@ -11,6 +11,7 @@ let countdownInterval = null;
 document.addEventListener('DOMContentLoaded', async () => {
   const { nightMode = false } = await getStorageData(['nightMode']);
   document.body.classList.toggle('dark-mode', nightMode);
+  document.body.appendChild(createOptionsLink());
   refreshPopup();
 });
 

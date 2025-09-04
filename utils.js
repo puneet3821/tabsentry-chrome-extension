@@ -118,3 +118,22 @@ export function setupTabListEventListeners(tabListContainer, onTabClose) {
     }
   });
 }
+
+// Opens the extension's options page.
+export function openOptionsPage() {
+  chrome.runtime.openOptionsPage();
+}
+
+// Creates and returns an options link element.
+export function createOptionsLink() {
+  const optionsLink = document.createElement('a');
+  optionsLink.href = '#';
+  optionsLink.id = 'options-link';
+  optionsLink.className = 'options-link';
+  optionsLink.textContent = '⚙️ Options';
+  optionsLink.addEventListener('click', (event) => {
+    event.preventDefault();
+    openOptionsPage();
+  });
+  return optionsLink;
+}

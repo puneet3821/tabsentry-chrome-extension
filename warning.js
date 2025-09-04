@@ -1,6 +1,6 @@
 'use strict';
 
-import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi } from './utils.js';
+import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi, createOptionsLink } from './utils.js';
 
 const header = document.getElementById('header');
 const snoozeButtons = document.getElementById('snooze-buttons');
@@ -11,6 +11,7 @@ let countdownInterval = null;
 document.addEventListener('DOMContentLoaded', async () => {
   const { nightMode = false } = await getStorageData(['nightMode']);
   document.body.classList.toggle('dark-mode', nightMode);
+  document.body.appendChild(createOptionsLink());
   refreshPage();
 });
 
@@ -63,6 +64,19 @@ setupTabListEventListeners(tabListContainer, refreshPage);
 
 chrome.runtime.onMessage.addListener((request) => {
   if (request.command === 'refresh') {
+    refreshPage();
+  }
+});
+
+chrome.tabs.onRemoved.addListener(refreshPage);
+chrome.tabs.onCreated.addListener(refreshPage);
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.url) {
+    refreshPage();
+  }
+});
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace === 'sync' && (changes.tabLimit || changes.snoozeUntil)) {
     refreshPage();
   }
 });
