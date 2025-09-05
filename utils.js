@@ -25,6 +25,7 @@ export function renderTabList(tabListContainer, tabs, onTitleClick) {
     const tabTitle = document.createElement('span');
     tabTitle.className = 'tab-title';
     tabTitle.textContent = tab.title;
+    tabTitle.title = tab.title; // Set the full title for the tooltip
     if (onTitleClick) {
       tabTitle.addEventListener('click', () => onTitleClick(tab.id));
     }

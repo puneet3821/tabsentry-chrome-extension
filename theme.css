@@ -33,6 +33,15 @@ hr {
   text-decoration: underline;
 }
 
+.tab-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  flex-grow: 1;
+  padding-right: 10px;
+}
+
 /* Dark Mode */
 body.dark-mode {
   background-color: #212529;
