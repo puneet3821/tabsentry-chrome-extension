@@ -43,7 +43,7 @@ function saveOptions() {
 }
 
 function restoreOptions() {
-  chrome.storage.sync.get({ tabLimit: 10, intrusiveMode: false, nightMode: false }, (items) => {
+  chrome.storage.sync.get({ tabLimit: 10, intrusiveMode: true, nightMode: false }, (items) => {
     tabLimitInput.value = items.tabLimit;
     intrusiveModeCheckbox.checked = items.intrusiveMode;
     nightModeCheckbox.checked = items.nightMode;

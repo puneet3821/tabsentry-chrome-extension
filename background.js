@@ -1,13 +1,16 @@
 import { getManagedTabs, getStorageData } from './utils.js';
 
+let warningTabCreationInProgress = false;
+
 async function updateBadgeAndWarning() {
   const managedTabs = await getManagedTabs();
+
   const tabCount = managedTabs.length;
   const data = await getStorageData(['tabLimit', 'snoozeUntil', 'intrusiveMode']);
 
   const limit = data.tabLimit || 10;
   const snoozeUntil = data.snoozeUntil || 0;
-  const intrusiveMode = data.intrusiveMode || false;
+  const intrusiveMode = data.intrusiveMode !== false;
 
   if (Date.now() < snoozeUntil) {
     chrome.action.setBadgeText({ text: '💤' });
@@ -39,14 +42,23 @@ async function updateBadgeAndWarning() {
 }
 
 async function handleIntrusiveWarning() {
+  if (warningTabCreationInProgress) {
+    return; // Exit if a warning tab is already being created.
+  }
+  warningTabCreationInProgress = true;
+
   const warningUrl = chrome.runtime.getURL('warning.html');
-  const tabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
-  if (tabs.length === 0) {
-    chrome.tabs.create({ url: 'warning.html' });
-  } else {
-    const tabId = tabs[0].id;
-    chrome.tabs.reload(tabId);
-    chrome.tabs.update(tabId, { active: true });
+  try {
+    const tabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
+    if (tabs.length === 0) {
+      await new Promise(resolve => chrome.tabs.create({ url: 'warning.html' }, resolve));
+    } else {
+      const tabId = tabs[0].id;
+      await new Promise(resolve => chrome.tabs.reload(tabId, resolve));
+      await new Promise(resolve => chrome.tabs.update(tabId, { active: true }, resolve));
+    }
+  } finally {
+    warningTabCreationInProgress = false; // Release the lock
   }
 }
 
