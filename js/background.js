@@ -2,29 +2,41 @@ import { getManagedTabs, getStorageData } from './utils.js';
 
 let warningTabCreationInProgress = false;
 
-async function updateBadgeAndWarning() {
+export async function updateBadgeAndWarning() {
   const managedTabs = await getManagedTabs();
 
   const tabCount = managedTabs.length;
   const data = await getStorageData(['tabLimit', 'snoozeUntil', 'intrusiveMode']);
 
-  const limit = data.tabLimit || 10;
+  const tabLimit = data.tabLimit || 10;
   const snoozeUntil = data.snoozeUntil || 0;
   const intrusiveMode = data.intrusiveMode !== false;
 
   if (Date.now() < snoozeUntil) {
     chrome.action.setBadgeText({ text: '💤' });
     chrome.action.setBadgeBackgroundColor({ color: '#808080' });
+    return; // Snooze takes precedence
+  }
+
+  chrome.action.setBadgeText({ text: String(tabCount) });
+
+  const orangeZoneThreshold = Math.floor(tabLimit * 0.7);
+
+  if (tabCount > tabLimit) {
+    // Red Zone
+    chrome.action.setBadgeBackgroundColor({ color: '#F44336' });
+    if (intrusiveMode) {
+      handleIntrusiveWarning();
+    }
   } else {
-    chrome.action.setBadgeText({ text: String(tabCount) });
-    if (limit && tabCount > limit) {
-      chrome.action.setBadgeBackgroundColor({ color: '#d93025' });
-      if (intrusiveMode) {
-        handleIntrusiveWarning();
-      }
+    // Not in Red Zone, close warning page
+    closeWarningTab();
+    if (tabCount > orangeZoneThreshold) {
+      // Orange Zone
+      chrome.action.setBadgeBackgroundColor({ color: '#FF9800' });
     } else {
-      chrome.action.setBadgeBackgroundColor({ color: '#1976d2' });
-      closeWarningTabIfNotActive();
+      // Green Zone
+      chrome.action.setBadgeBackgroundColor({ color: '#4CAF50' });
     }
   }
 
@@ -80,44 +92,45 @@ async function handleIntrusiveWarning() {
   }
 }
 
-async function closeWarningTabIfNotActive() {
+function closeWarningTab() {
   const warningUrl = chrome.runtime.getURL('pages/warning/warning.html');
-  const warningTabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
-  if (warningTabs.length > 0 && !warningTabs[0].active) {
-    chrome.tabs.remove(warningTabs[0].id, () => {
-      if (chrome.runtime.lastError) {
-        console.log(`Could not remove warning tab: ${chrome.runtime.lastError.message}`);
+  chrome.tabs.query({ url: warningUrl }, (tabs) => {
+    if (tabs && tabs.length > 0) {
+      for (let i = 0; i < tabs.length; i++) {
+        chrome.tabs.remove(tabs[i].id);
       }
-    });
-  }
+    }
+  });
 }
 
-chrome.tabs.onCreated.addListener((tab) => {
-  if (tab.pendingUrl && tab.pendingUrl.includes('pages/warning/warning.html')) {
-    return;
-  }
+if (typeof chrome !== 'undefined' && chrome.tabs) {
+  chrome.tabs.onCreated.addListener((tab) => {
+    if (tab.pendingUrl && tab.pendingUrl.includes('pages/warning/warning.html')) {
+      return;
+    }
+    updateBadgeAndWarning();
+  });
+
+  chrome.tabs.onRemoved.addListener(updateBadgeAndWarning);
+
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    // If a tab's pinned status or group status changes, trigger an update.
+    if (changeInfo.hasOwnProperty('pinned') || changeInfo.hasOwnProperty('groupId')) {
+      updateBadgeAndWarning();
+    }
+  });
+
+  chrome.runtime.onMessage.addListener((request) => {
+    if (request.command === 'updateBadge') {
+      updateBadgeAndWarning();
+    }
+  });
+
+  chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'sync' && changes.tabLimit) {
+      updateBadgeAndWarning();
+    }
+  });
+
   updateBadgeAndWarning();
-});
-
-chrome.tabs.onRemoved.addListener(updateBadgeAndWarning);
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  // If a tab's pinned status or group status changes, trigger an update.
-  if (changeInfo.hasOwnProperty('pinned') || changeInfo.hasOwnProperty('groupId')) {
-    updateBadgeAndWarning();
-  }
-});
-
-chrome.runtime.onMessage.addListener((request) => {
-  if (request.command === 'updateBadge') {
-    updateBadgeAndWarning();
-  }
-});
-
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  if (namespace === 'sync' && changes.tabLimit) {
-    updateBadgeAndWarning();
-  }
-});
-
-updateBadgeAndWarning();
+}
