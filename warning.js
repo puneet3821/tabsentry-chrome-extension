@@ -32,7 +32,12 @@ async function refreshPage() {
     snoozeUntil,
     tabs: managedTabs,
     onTitleClick: (tabId) => {
-      chrome.tabs.update(tabId, { active: true });
+      chrome.tabs.update(tabId, { active: true }, () => {
+        if (chrome.runtime.lastError) {
+          console.log(`Could not activate tab ${tabId}: ${chrome.runtime.lastError.message}`);
+          refreshPage();
+        }
+      });
     },
     onUnderLimit: () => {
       header.style.backgroundColor = '#e8f5e9';
@@ -78,5 +83,18 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === 'sync' && (changes.tabLimit || changes.snoozeUntil)) {
     refreshPage();
+  }
+});
+
+// Close the warning tab if it's not the active tab.
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const warningUrl = chrome.runtime.getURL('warning.html');
+  const tabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
+  if (tabs.length > 0 && tabs[0].id !== activeInfo.tabId) {
+    chrome.tabs.remove(tabs[0].id, () => {
+      if (chrome.runtime.lastError) {
+        console.log(`Could not remove self from onActivated: ${chrome.runtime.lastError.message}`);
+      }
+    });
   }
 });

@@ -108,13 +108,17 @@ export function setupSnoozeEventListeners(snoozeContainer) {
 
 // Sets up the event listeners for closing tabs from a list.
 export function setupTabListEventListeners(tabListContainer, onTabClose) {
-  tabListContainer.addEventListener('click', async (event) => {
+  tabListContainer.addEventListener('click', (event) => {
     if (event.target.tagName === 'BUTTON' && event.target.dataset.tabId) {
       const tabId = parseInt(event.target.dataset.tabId, 10);
-      await new Promise(resolve => chrome.tabs.remove(tabId, resolve));
-      if (onTabClose) {
-        onTabClose();
-      }
+      chrome.tabs.remove(tabId, () => {
+        if (chrome.runtime.lastError) {
+          console.log(`Could not remove tab ${tabId}: ${chrome.runtime.lastError.message}`);
+        }
+        if (onTabClose) {
+          onTabClose();
+        }
+      });
     }
   });
 }
