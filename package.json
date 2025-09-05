@@ -1,0 +1,25 @@
+{
+  "name": "tabsentry",
+  "version": "1.0.0",
+  "description": "## Overview",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "build": "rm -rf dist && mkdir dist && cp -r assets css js pages manifest.json dist && rm dist/js/utils.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puneet3821/tabsentry-chrome-extension.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/puneet3821/tabsentry-chrome-extension/issues"
+  },
+  "homepage": "https://github.com/puneet3821/tabsentry-chrome-extension#readme",
+  "devDependencies": {
+    "jest": "^30.1.3"
+  }
+}
