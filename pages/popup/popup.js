@@ -1,6 +1,6 @@
 'use strict';
 
-import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi, createOptionsLink } from './utils.js';
+import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi, createOptionsLink } from '../../js/utils.js';
 
 const statusBox = document.getElementById('status-box');
 const snoozeButtons = document.getElementById('snooze-buttons');

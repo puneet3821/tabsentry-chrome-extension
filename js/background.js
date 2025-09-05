@@ -29,7 +29,7 @@ async function updateBadgeAndWarning() {
   }
 
   // Always inform the warning page to refresh its list, if it exists.
-  const warningUrl = chrome.runtime.getURL('warning.html');
+  const warningUrl = chrome.runtime.getURL('pages/warning/warning.html');
   const warningTabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
   if (warningTabs.length > 0) {
     try {
@@ -47,11 +47,11 @@ async function handleIntrusiveWarning() {
   }
   warningTabCreationInProgress = true;
 
-  const warningUrl = chrome.runtime.getURL('warning.html');
+  const warningUrl = chrome.runtime.getURL('pages/warning/warning.html');
   try {
     const tabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
     if (tabs.length === 0) {
-      await new Promise(resolve => chrome.tabs.create({ url: 'warning.html' }, resolve));
+      await new Promise(resolve => chrome.tabs.create({ url: 'pages/warning/warning.html' }, resolve));
     } else {
       const tabId = tabs[0].id;
       try {
@@ -71,7 +71,7 @@ async function handleIntrusiveWarning() {
         console.log(`Could not update warning tab (${tabId}), it was likely closed. Error: ${error.message}`);
         const freshTabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
         if (freshTabs.length === 0) {
-          await new Promise(resolve => chrome.tabs.create({ url: 'warning.html' }, resolve));
+          await new Promise(resolve => chrome.tabs.create({ url: 'pages/warning/warning.html' }, resolve));
         }
       }
     }
@@ -81,7 +81,7 @@ async function handleIntrusiveWarning() {
 }
 
 async function closeWarningTabIfNotActive() {
-  const warningUrl = chrome.runtime.getURL('warning.html');
+  const warningUrl = chrome.runtime.getURL('pages/warning/warning.html');
   const warningTabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
   if (warningTabs.length > 0 && !warningTabs[0].active) {
     chrome.tabs.remove(warningTabs[0].id, () => {
@@ -93,7 +93,7 @@ async function closeWarningTabIfNotActive() {
 }
 
 chrome.tabs.onCreated.addListener((tab) => {
-  if (tab.pendingUrl && tab.pendingUrl.includes('warning.html')) {
+  if (tab.pendingUrl && tab.pendingUrl.includes('pages/warning/warning.html')) {
     return;
   }
   updateBadgeAndWarning();

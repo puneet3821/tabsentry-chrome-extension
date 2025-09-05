@@ -5,7 +5,7 @@ export async function getManagedTabs() {
   const tabs = await new Promise(resolve => {
     chrome.tabs.query({ windowType: 'normal', pinned: false }, resolve);
   });
-  const warningUrl = chrome.runtime.getURL('warning.html');
+  const warningUrl = chrome.runtime.getURL('pages/warning/warning.html');
   return tabs.filter(tab => tab.url !== warningUrl && tab.groupId === -1);
 }
 

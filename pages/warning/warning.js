@@ -1,6 +1,6 @@
 'use strict';
 
-import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi, createOptionsLink } from './utils.js';
+import { getManagedTabs, getStorageData, setupSnoozeEventListeners, setupTabListEventListeners, cancelSnooze, formatTimeRemaining, updateUi, createOptionsLink } from '../../js/utils.js';
 
 const header = document.getElementById('header');
 const snoozeButtons = document.getElementById('snooze-buttons');
@@ -88,7 +88,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 // Close the warning tab if it's not the active tab.
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const warningUrl = chrome.runtime.getURL('warning.html');
+  const warningUrl = chrome.runtime.getURL('pages/warning/warning.html');
   const tabs = await new Promise(resolve => chrome.tabs.query({ url: warningUrl }, resolve));
   if (tabs.length > 0 && tabs[0].id !== activeInfo.tabId) {
     chrome.tabs.remove(tabs[0].id, () => {
