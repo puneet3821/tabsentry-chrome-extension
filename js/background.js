@@ -1,3 +1,9 @@
+chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason === 'install') {
+        chrome.tabs.create({ url: 'pages/welcome/welcome.html' });
+    }
+});
+
 import { getManagedTabs, getStorageData } from './utils.js';
 
 let warningTabCreationInProgress = false;
