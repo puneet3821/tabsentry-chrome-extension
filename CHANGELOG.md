@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-09-07
+
+### ✨ Added
+- **Welcome & Onboarding Page:** A new welcome page now opens on first installation to guide users through features and setup.
+- **Revisit Welcome Guide:** Added a link with an icon on the Options page for users to easily access the welcome guide at any time.
+- **Unit Testing Framework:** Introduced Jest for unit testing to improve code quality and reliability.
+
+### 🚀 Improved
+- **Three-Zone Badge System:** The extension badge now provides proactive feedback, changing color from Green (safe) to Orange (nearing limit) to Red (over limit).
+- **Auto-Closing Warning Page:** The intrusive warning page now closes automatically as soon as the user's tab count returns to the set limit, providing a more rewarding user experience.
+- **Complete Options Page Redesign:** The Options page has been completely overhauled with a modern, card-based UI, intuitive toggle switches, and a much cleaner layout.
+
+### 🛠️ Internal
+- **Project Structure Refactor:** Reorganized all files into a scalable folder structure (`js`, `css`, `pages`, `assets`) for better maintainability.
+
 ## [1.0.0] - 2025-09-04
 
 ### Added
